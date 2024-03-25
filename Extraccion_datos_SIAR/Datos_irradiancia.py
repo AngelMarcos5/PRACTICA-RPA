@@ -21,7 +21,7 @@ respuesta = requests.get(url)
 # Verificar y procesar la respuesta
 if respuesta.status_code == 200:
     datos = respuesta.json()
-    nombre_archivo_csv = "C:\\Users\\angel\\Desktop\\MASTER\\TFM\\DATOS_IRRADIANCIA\\datos_irradiancia.csv"
+    nombre_archivo_csv = f"C:\\Users\\angel\\Desktop\\MASTER\\TFM\\DATOS_IRRADIANCIA\\datos_irradiancia_{fecha_inicial_str}_a_{fecha_final_str}.csv"
 
     with open(nombre_archivo_csv, 'w', newline='') as archivo_csv:
         escritor = csv.writer(archivo_csv)
