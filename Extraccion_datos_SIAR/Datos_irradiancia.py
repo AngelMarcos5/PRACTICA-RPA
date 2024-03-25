@@ -5,7 +5,7 @@ import csv
 # Configuración inicial
 clave_api = "_4MMKz3eDiSwUtRqqVi62W-a8XDVmoEgqa0o_bGC_o9vjOvROu"
 id_estacion = "TF164"
-fecha_final = datetime.today()
+fecha_final = datetime.today() - timedelta(days=1)
 fecha_inicial = fecha_final - timedelta(days=1)
 
 # Formatear las fechas para la solicitud
@@ -25,13 +25,16 @@ if respuesta.status_code == 200:
 
     with open(nombre_archivo_csv, 'w', newline='') as archivo_csv:
         escritor = csv.writer(archivo_csv)
-        escritor.writerow(['Fecha', 'Radiacion'])
+        escritor.writerow(['Fecha y Hora', 'Radiacion'])
 
-        # Asumiendo que 'Radiacion' es uno de los campos en la respuesta; ajustar según sea necesario
-        for registro in datos['Datos']:
-            escritor.writerow([registro['Fecha'], registro.get('Radiacion', 'No Disponible')])
+        for i, registro in enumerate(datos['Datos']):
+            # Ajustar la hora para cada entrada, asumiendo que cada entrada es de 30 minutos
+            fecha_hora_ajustada = datetime.strptime(registro['Fecha'], '%Y-%m-%dT%H:%M:%S')
+            fecha_hora_ajustada += timedelta(minutes=30 * i)  # Incrementa 30 minutos por cada registro
+            escritor.writerow([fecha_hora_ajustada.strftime('%Y-%m-%d %H:%M:%S'), registro.get('Radiacion', 'No Disponible')])
 
     print(f"Datos guardados en {nombre_archivo_csv}")
 else:
     print(f"Error al realizar la solicitud: {respuesta.status_code}, Detalles: {respuesta.text}")
+
 
