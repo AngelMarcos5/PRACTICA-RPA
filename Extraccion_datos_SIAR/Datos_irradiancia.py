@@ -5,7 +5,7 @@ import csv
 # Configuración inicial
 clave_api = "_4MMKz3eDiSwUtRqqVi62W-a8XDVmoEgqa0o_bGC_o9vjOvROu"
 id_estacion = "TF164"
-fecha_final = datetime.today() - timedelta(days=1)
+fecha_final = datetime.today() - timedelta(days=156)
 fecha_inicial = fecha_final - timedelta(days=1)
 
 # Formatear las fechas para la solicitud
