@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.common.exceptions import ElementClickInterceptedException, TimeoutException
 import time
 import os
 import glob
@@ -117,9 +118,16 @@ for day in range(370):  # Incluye el día actual y los 350 días anteriores
 
         time.sleep(5)  # Espera antes de reintentar
 
+
     # Si el archivo se descargó correctamente o después del primer día, procede a retroceder un día para la siguiente iteración
     if day != 0 and archivo_descargado:  # Se añade la comprobación de archivo_descargado para asegurar que solo retrocedemos si el día actual fue exitoso
-        WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".station-date-picker_left"))).click()
+        try:
+            # Esperar a que cualquier elemento interceptador se vuelva invisible antes de intentar hacer clic
+            WebDriverWait(driver, 20).until(EC.invisibility_of_element((By.CSS_SELECTOR, ".gdw-message-mask.active")))
+            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".station-date-picker_left"))).click()
+        except TimeoutException:
+            print("El elemento interceptador no desapareció después de 20 segundos, reintentando el clic...")
+            # Aquí podrías incluir un manejo de excepciones adicional o un reintento según sea necesario
         time.sleep(2)  # Espera a que la página se actualice
 
 # Cerrar el navegador al finalizar todas las descargas
