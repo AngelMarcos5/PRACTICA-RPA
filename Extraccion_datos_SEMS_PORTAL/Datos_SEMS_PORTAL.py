@@ -122,12 +122,16 @@ for day in range(370):  # Incluye el día actual y los 350 días anteriores
     # Si el archivo se descargó correctamente o después del primer día, procede a retroceder un día para la siguiente iteración
     if day != 0 and archivo_descargado:  # Se añade la comprobación de archivo_descargado para asegurar que solo retrocedemos si el día actual fue exitoso
         try:
-            # Esperar a que cualquier elemento interceptador se vuelva invisible antes de intentar hacer clic
-            WebDriverWait(driver, 20).until(EC.invisibility_of_element((By.CSS_SELECTOR, ".gdw-message-mask.active")))
+            # Intentar eliminar o hacer invisible el elemento interceptador mediante JavaScript
+            driver.execute_script("""
+                var interceptor = document.querySelector(".gdw-message-mask.active");
+                if (interceptor) {
+                    interceptor.style.display = "none";
+                }
+            """)
             WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".station-date-picker_left"))).click()
-        except TimeoutException:
-            print("El elemento interceptador no desapareció después de 20 segundos, reintentando el clic...")
-            # Aquí podrías incluir un manejo de excepciones adicional o un reintento según sea necesario
+        except Exception as e:
+            print(f"No se pudo hacer clic en el botón debido a: {e}")
         time.sleep(2)  # Espera a que la página se actualice
 
 # Cerrar el navegador al finalizar todas las descargas
