@@ -9,7 +9,7 @@ import time
 import os
 import glob
 
-download_folder = "C:\\Users\\angel\\Desktop\\MASTER\\TFM"
+download_folder = "C:\\Users\\angel\\Desktop\\MASTER\\TFM\\DATOS_SEGAI"
 
 options = webdriver.ChromeOptions()  # Opciones de navegación con selenium
 options.add_argument("--headless")  # Comentar esta línea si se desea ver la ejecución en modo no headless
