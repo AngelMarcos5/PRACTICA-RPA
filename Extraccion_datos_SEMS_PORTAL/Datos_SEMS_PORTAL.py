@@ -119,20 +119,20 @@ for day in range(370):  # Incluye el día actual y los 350 días anteriores
         time.sleep(5)  # Espera antes de reintentar
 
 
-    # Si el archivo se descargó correctamente o después del primer día, procede a retroceder un día para la siguiente iteración
+ # Si el archivo se descargó correctamente o después del primer día, procede a retroceder un día para la siguiente iteración
     if day != 0 and archivo_descargado:  # Se añade la comprobación de archivo_descargado para asegurar que solo retrocedemos si el día actual fue exitoso
-        try:
-            # Intentar eliminar o hacer invisible el elemento interceptador mediante JavaScript
-            driver.execute_script("""
-                var interceptor = document.querySelector(".gdw-message-mask.active");
-                if (interceptor) {
-                    interceptor.style.display = "none";
-                }
-            """)
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".station-date-picker_left"))).click()
-        except Exception as e:
-            print(f"No se pudo hacer clic en el botón debido a: {e}")
-        time.sleep(2)  # Espera a que la página se actualice
+        for retry in range(5):  # Intentar hasta 5 veces si es interceptado
+            try:
+                WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".station-date-picker_left"))).click()
+                break  # Si el clic fue exitoso, salir del bucle de reintento
+            except ElementClickInterceptedException:
+                print(f"El clic en el botón fue interceptado, reintentando... {retry + 1}")
+                time.sleep(2)  # Espera un poco antes de reintentar
+        
+        if retry == 4:  # Si se alcanzó el máximo de intentos
+            print("No se pudo hacer clic en el botón después de varios intentos.")
+
+        time.sleep(2)  # Espera a que la página se actualice después de un clic exitoso
 
 # Cerrar el navegador al finalizar todas las descargas
 driver.quit()
