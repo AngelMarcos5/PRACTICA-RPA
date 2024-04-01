@@ -119,20 +119,30 @@ for day in range(370):  # Incluye el día actual y los 350 días anteriores
         time.sleep(5)  # Espera antes de reintentar
 
 
- # Si el archivo se descargó correctamente o después del primer día, procede a retroceder un día para la siguiente iteración
-    if day != 0 and archivo_descargado:  # Se añade la comprobación de archivo_descargado para asegurar que solo retrocedemos si el día actual fue exitoso
-        for retry in range(5):  # Intentar hasta 5 veces si es interceptado
+    # Si el archivo se descargó correctamente o después del primer día, procede a retroceder un día para la siguiente iteración
+    if day != 0 and archivo_descargado:
+        # Intenta hacer clic en el botón, con reintentos en caso de fallos
+        max_attempts = 3
+        for attempt in range(max_attempts):
             try:
-                WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".station-date-picker_left"))).click()
-                break  # Si el clic fue exitoso, salir del bucle de reintento
+                # Esperar primero a que desaparezca el elemento interceptador
+                WebDriverWait(driver, 10).until(EC.invisibility_of_element((By.CSS_SELECTOR, ".gdw-message-mask.active")))
+                # Después, esperar a que el botón sea clickeable y hacer clic
+                WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".station-date-picker_left"))).click()
+                break  # Salir del bucle si el clic fue exitoso
+            except TimeoutException:
+                print(f"Intento {attempt + 1}: El elemento interceptador no desapareció después de 10 segundos.")
             except ElementClickInterceptedException:
-                print(f"El clic en el botón fue interceptado, reintentando... {retry + 1}")
-                time.sleep(2)  # Espera un poco antes de reintentar
-        
-        if retry == 4:  # Si se alcanzó el máximo de intentos
-            print("No se pudo hacer clic en el botón después de varios intentos.")
+                print(f"Intento {attempt + 1}: El clic fue interceptado por otro elemento.")
+            # Implementar una lógica de reintento inteligente, con espera incremental
+            wait_time = 2 + (2 * attempt)
+            print(f"Esperando {wait_time} segundos antes del próximo intento...")
+            time.sleep(wait_time)
+        else:
+            print("No fue posible hacer clic en el botón después de varios intentos.")
 
-        time.sleep(2)  # Espera a que la página se actualice después de un clic exitoso
+    # Espera a que la página se actualice después de un clic exitoso o el último intento
+    time.sleep(2)
 
 # Cerrar el navegador al finalizar todas las descargas
 driver.quit()
