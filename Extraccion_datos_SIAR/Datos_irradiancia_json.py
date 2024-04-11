@@ -1,6 +1,34 @@
 import pyautogui
 import requests
 from datetime import datetime, timedelta
+import time
+import pyperclip
+
+# Función para abrir Microsoft Word
+def abrir_word():
+    pyautogui.press('win') # Abrimos el menú de inicio
+    time.sleep(2)
+    pyautogui.write('Word') # Escribimos 'Word' para buscar la aplicación
+    time.sleep(2)
+    pyautogui.press('enter') # Abre Microsoft Word
+    time.sleep(5)
+
+def escribir_en_word(textos):
+    abrir_word()  # Asegura que Word esté abierto antes de escribir
+    for texto in textos:
+        pyperclip.copy(texto)  # Copia el texto al portapapeles
+        pyautogui.hotkey('ctrl', 'v')  # Pega el texto desde el portapapeles
+        pyautogui.press('enter')  # Presiona enter para un nuevo párrafo
+        time.sleep(1)
+    pyautogui.hotkey('ctrl', 'g')  # Inicia el proceso de guardado
+    time.sleep(2)
+    # Define la ruta completa donde deseas guardar el archivo, incluyendo el nombre del archivo y la extensión
+    ruta_completa = r'C:\Users\angel\Desktop\MASTER\2º CURSO\GitHUB\PRACTICA_RPA\DatosMeteorologicos.docx'
+    pyperclip.copy(ruta_completa)  # Copia la ruta al portapapeles
+    pyautogui.hotkey('ctrl', 'v')  # Pega la ruta en el cuadro de diálogo de guardado
+    time.sleep(1)
+    pyautogui.press('enter')  # Confirma el guardado
+    time.sleep(2)  # Espera a que el documento se guarde
 
 # Mostrar la alerta y pedir al usuario que ingrese una fecha
 fecha_elegida = pyautogui.prompt("Por favor, ingrese una fecha en el formato 'AAAA-MM-DD' para la consulta:")
@@ -26,7 +54,7 @@ if fecha_elegida:
         # Verificar y procesar la respuesta
         if respuesta.status_code == 200:
             datos = respuesta.json()
-
+            textos_para_word = []
             # Procesar y mostrar los datos solicitados
             for i, registro in enumerate(datos['Datos']):
                 # Ajustar la fecha y hora para reflejar intervalos de 30 minutos
@@ -36,12 +64,9 @@ if fecha_elegida:
                 # Formatear la fecha ajustada para la impresión
                 fecha_hora_str = fecha_hora_ajustada.strftime('%Y-%m-%d %H:%M:%S')
                 
-                radiacion = registro.get('Radiacion', 'No Disponible')
-                temp_media = registro.get('TempMedia', 'No Disponible')
-                vel_viento = registro.get('VelViento', 'No Disponible')
-                dir_viento = registro.get('DirViento', 'No Disponible')
-                
-                print(f"Fecha: {fecha_hora_str}, Radiación: {radiacion}, Temp. Media: {temp_media}°C, Vel. Viento: {vel_viento} m/s, Dir. Viento: {dir_viento}°")
+                linea = f"Fecha: {fecha_hora_str}, Radiación: {registro.get('Radiacion', 'No Disponible')}, Temp. Media: {registro.get('TempMedia', 'No Disponible')}°C, Vel. Viento: {registro.get('VelViento', 'No Disponible')} m/s, Dir. Viento: {registro.get('DirViento', 'No Disponible')}°"
+                textos_para_word.append(linea)
+            escribir_en_word(textos_para_word)
         else:
             print(f"Error al realizar la solicitud: {respuesta.status_code}, Detalles: {respuesta.text}")
     except ValueError:
