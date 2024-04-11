@@ -29,6 +29,8 @@ def escribir_en_word(textos):
     time.sleep(1)
     pyautogui.press('enter')  # Confirma el guardado
     time.sleep(2)  # Espera a que el documento se guarde
+    # Mostrar mensaje de finalización por pantalla
+    pyautogui.alert("Datos guardados correctamente.")
 
 # Mostrar la alerta y pedir al usuario que ingrese una fecha
 fecha_elegida = pyautogui.prompt("Por favor, ingrese una fecha en el formato 'AAAA-MM-DD' para la consulta:")
