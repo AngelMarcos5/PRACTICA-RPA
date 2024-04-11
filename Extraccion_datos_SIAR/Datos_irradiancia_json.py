@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 clave_api = "_4MMKz3eDiSwUtRqqVi62W-a8XDVmoEgqa0o_bGC_o9vjOvROu"
 id_estacion = "TF164"
 fecha_final = datetime.today()
-fecha_inicial = fecha_final - timedelta(days=1)
+fecha_inicial = fecha_final - timedelta(days=0)
 
 # Formatear las fechas para la solicitud
 fecha_inicial_str = fecha_inicial.strftime('%Y-%m-%d')
@@ -21,8 +21,15 @@ respuesta = requests.get(url)
 if respuesta.status_code == 200:
     datos = respuesta.json()
 
-    # Procesar y mostrar los datos de irradiación
+    # Procesar y mostrar los datos solicitados
     for registro in datos['Datos']:
-        print(f"Fecha: {registro['Fecha']}, Radiación: {registro.get('Radiacion', 'No Disponible')}")
+        fecha = registro['Fecha']
+        radiacion = registro.get('Radiacion', 'No Disponible')
+        temp_media = registro.get('TempMedia', 'No Disponible')
+        vel_viento = registro.get('VelViento', 'No Disponible')
+        dir_viento = registro.get('DirViento', 'No Disponible')
+        
+        print(f"Fecha: {fecha}, Radiación: {radiacion}, Temp. Media: {temp_media}°C, Vel. Viento: {vel_viento} m/s, Dir. Viento: {dir_viento}°")
 else:
     print(f"Error al realizar la solicitud: {respuesta.status_code}, Detalles: {respuesta.text}")
+
