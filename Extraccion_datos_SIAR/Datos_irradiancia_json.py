@@ -22,14 +22,21 @@ if respuesta.status_code == 200:
     datos = respuesta.json()
 
     # Procesar y mostrar los datos solicitados
-    for registro in datos['Datos']:
-        fecha = registro['Fecha']
+    for i, registro in enumerate(datos['Datos']):
+        # Ajustar la fecha y hora para reflejar intervalos de 30 minutos
+        fecha_hora_ajustada = datetime.strptime(registro['Fecha'], '%Y-%m-%dT%H:%M:%S')
+        fecha_hora_ajustada += timedelta(minutes=30 * i)  # Incrementa 30 minutos por cada registro
+        
+        # Formatear la fecha ajustada para la impresión
+        fecha_hora_str = fecha_hora_ajustada.strftime('%Y-%m-%d %H:%M:%S')
+        
         radiacion = registro.get('Radiacion', 'No Disponible')
         temp_media = registro.get('TempMedia', 'No Disponible')
         vel_viento = registro.get('VelViento', 'No Disponible')
         dir_viento = registro.get('DirViento', 'No Disponible')
         
-        print(f"Fecha: {fecha}, Radiación: {radiacion}, Temp. Media: {temp_media}°C, Vel. Viento: {vel_viento} m/s, Dir. Viento: {dir_viento}°")
+        print(f"Fecha: {fecha_hora_str}, Radiación: {radiacion}, Temp. Media: {temp_media}°C, Vel. Viento: {vel_viento} m/s, Dir. Viento: {dir_viento}°")
 else:
     print(f"Error al realizar la solicitud: {respuesta.status_code}, Detalles: {respuesta.text}")
+
 
